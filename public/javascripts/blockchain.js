@@ -2,84 +2,119 @@
 // global variable setup
 /////////////////////////
 
-// number of zeros required at front of hash
-var difficultyMajor = 4;
-
-// 0-15, maximum (decimal) value of the hex digit after the front
-// 15 means any hex character is allowed next
-// 7  means next bit must be 0 (because 0x7=0111),
-//    (so the bit-strength is doubled)
-// 0  means only 0x0 can be next
-//    (equivalent to one more difficultyMajor)
-var difficultyMinor = 15;  
-
-var maximumNonce = 8;  // limit the nonce so we don't mine too long
-var pattern = '';
-for (var x=0; x<difficultyMajor; x++) {
-  pattern += '0';     // every additional required 0
-  maximumNonce *= 16; // takes 16x longer to mine
+async function setup() {
+  const initialMessage = "initial message";
+  try {
+    const response = await axios.get(`/api/setup/${initialMessage}`);
+    console.log('setup Response:', response.data.result);
+    return response.data.result;  // Axios automatically handles JSON parsing
+  } catch (error) {
+    console.error('setup Error:', error);
+  }
 }
-// at this point in the setup, difficultyMajor=4
-// yields pattern '0000' and maximumNonce 8*16^4=524288
 
-// add one more hex-char for the minor difficulty
-pattern += difficultyMinor.toString(16);
-var patternLen = pattern.length; // == difficultyMajor+1
+async function chameleonhash(hashinput) {
+  const hashinfo = hashinput;
+  console.log('frontend hashinput:', hashinfo);
+  try {
+    const response = await axios.post('/api/hash', { hashinfo })
+    console.log('frontend chameleonhash response:', response.data.result);
+    return response.data.result;  // Axios automatically handles JSON parsing
+  } catch (error) {
+    console.error('chameleonhash Error:', error);
+  }
+}
 
-if      (difficultyMinor == 0) { maximumNonce *= 16; } // 0000 require 4 more 0 bits
-else if (difficultyMinor == 1) { maximumNonce *= 8;  } // 0001 require 3 more 0 bits
-else if (difficultyMinor <= 3) { maximumNonce *= 4;  } // 0011 require 2 more 0 bits
-else if (difficultyMinor <= 7) { maximumNonce *= 2;  } // 0111 require 1 more 0 bit
-// else don't bother increasing maximumNonce, it already started with 8x padding
+async function adapt(adaptInput) {
+  const adaptinfo = adaptInput;
+  console.log('adaptInput:', adaptinfo.h);
+  try {
+    const response = await axios.post('/api/adapt', { adaptinfo })
+    console.log('adapt Response:', response.data.result.new_h);
+    return response.data.result;  // Axios automatically handles JSON parsing
+  } catch (error) {
+    console.error('adapt Error:', error);
+  }
+}
 
+async function setupBlock(block, chain) {
+  const result = await setup();
+  $('#block' + block + 'chain' + chain + 'matrixA').val(JSON.stringify(result.A));
+  $('#block' + block + 'chain' + chain + 'trapdoorA_e').val(JSON.stringify(result.trapdoor.e));
+  $('#block' + block + 'chain' + chain + 'trapdoorA_r').val(JSON.stringify(result.trapdoor.r));
+  $('#block' + block + 'chain' + chain + 'nonce_z').val(JSON.stringify(result.z));
+  $('#block' + block + 'chain' + chain + 'nonce_e1').val(JSON.stringify(result.e1));
+  $('#block' + block + 'chain' + chain + 'nonce_e2').val(JSON.stringify(result.e2));
+  $('#block' + block + 'chain' + chain + 'data').val("initial message");
+  $('#block' + block + 'chain' + chain + 'hash').val(JSON.stringify(result.h));
 
+  if (block > 1) {
+    $('#block' + block + 'chain' + chain + 'previous').val($('#block' + (block - 1).toString() + 'chain' + chain + 'hash').val());
+  }
+  updateState(block, chain);
+}
 
-/////////////////////////
-// functions
-/////////////////////////
-function sha256(block, chain) {
-  // calculate a SHA256 hash of the contents of the block
-  return CryptoJS.SHA256(getText(block, chain));
+async function updateHash(block, chain) {
+  // update the hash value for this block
+  const hashinput = {
+    A: JSON.parse($('#block' + block + 'chain' + chain + 'matrixA').val()),
+    z: JSON.parse($('#block' + block + 'chain' + chain + 'nonce_z').val()),
+    e1: JSON.parse($('#block' + block + 'chain' + chain + 'nonce_e1').val()),
+    e2: JSON.parse($('#block' + block + 'chain' + chain + 'nonce_e2').val()),
+    message: $('#block' + block + 'chain' + chain + 'data').val()
+  };
+  const result = await chameleonhash(hashinput);
+  // console.log('updateHash response:', result);
+  $('#block' + block + 'chain' + chain + 'hash').val(JSON.stringify(result.h));
+  updateState(block, chain);
+}
+
+async function adaptBlock(block, chain) {
+  if ($('#block' + block + 'chain' + chain + 'newdata').val() == "") {
+    console.log('No new data to adapt');
+    return;
+  }
+  if ($('#block' + block + 'chain' + chain + 'newdata').val() == $('#block' + block + 'chain' + chain + 'data').val()) {
+    console.log('New data is the same as old data');
+    return;
+  }
+  const adaptInput = {
+    A: JSON.parse($('#block' + block + 'chain' + chain + 'matrixA').val()),
+    trapdoor_e: JSON.parse($('#block' + block + 'chain' + chain + 'trapdoorA_e').val()),
+    trapdoor_r: JSON.parse($('#block' + block + 'chain' + chain + 'trapdoorA_r').val()),
+    z: JSON.parse($('#block' + block + 'chain' + chain + 'nonce_z').val()),
+    e1: JSON.parse($('#block' + block + 'chain' + chain + 'nonce_e1').val()),
+    e2: JSON.parse($('#block' + block + 'chain' + chain + 'nonce_e2').val()),
+    h: JSON.parse($('#block' + block + 'chain' + chain + 'hash').val()),
+    message: $('#block' + block + 'chain' + chain + 'data').val(),
+    new_message: $('#block' + block + 'chain' + chain + 'newdata').val()
+  };
+  const result = await adapt(adaptInput);
+  $('#block' + block + 'chain' + chain + 'nonce_z').val(JSON.stringify(result.new_z));
+  $('#block' + block + 'chain' + chain + 'nonce_e1').val(JSON.stringify(result.new_e1));
+  $('#block' + block + 'chain' + chain + 'nonce_e2').val(JSON.stringify(result.new_e2));
+  $('#block' + block + 'chain' + chain + 'hash').val(JSON.stringify(result.new_h));
+  $('#block' + block + 'chain' + chain + 'data').val($('#block' + block + 'chain' + chain + 'newdata').val());
+  updateState(block, chain);
 }
 
 function updateState(block, chain) {
   // set the well background red or green for this block
-  if ($('#block'+block+'chain'+chain+'hash').val().substr(0, patternLen) <= pattern) {
-      $('#block'+block+'chain'+chain+'well').removeClass('well-error').addClass('well-success');
+  if (block == 1) {
+    $('#block' + block + 'chain' + chain + 'well').removeClass('well-error').addClass('well-success');
   }
-  else {
-      $('#block'+block+'chain'+chain+'well').removeClass('well-success').addClass('well-error');
+  else if ($('#block' + block + 'chain' + chain + 'previous').val() == $('#block' + (block - 1).toString() + 'chain' + chain + 'hash').val()) {
+    $('#block' + block + 'chain' + chain + 'well').removeClass('well-error').addClass('well-success');
+  } else {
+    $('#block' + block + 'chain' + chain + 'well').removeClass('well-success').addClass('well-error');
   }
 }
 
-function updateHash(block, chain) {
-  // update the SHA256 hash value for this block
-  $('#block'+block+'chain'+chain+'hash').val(sha256(block, chain));
+function updatePrevHash(block, chain) {
+  if (block > 1) {
+    $('#block' + block + 'chain' + chain + 'previous').val($('#block' + (block - 1).toString() + 'chain' + chain + 'hash').val());
+  }
   updateState(block, chain);
 }
 
-function updateChain(block, chain) {
-  // update all blocks walking the chain from this block to the end
-  for (var x = block; x <= 5; x++) {
-    if (x > 1) {
-      $('#block'+x+'chain'+chain+'previous').val($('#block'+(x-1).toString()+'chain'+chain+'hash').val());
-    }
-    updateHash(x, chain);
-  }
-}
 
-function mine(block, chain, isChain) {
-  for (var x = 0; x <= maximumNonce; x++) {
-    $('#block'+block+'chain'+chain+'nonce').val(x);
-    $('#block'+block+'chain'+chain+'hash').val(sha256(block, chain));
-    if ($('#block'+block+'chain'+chain+'hash').val().substr(0, patternLen) <= pattern) {
-      if (isChain) {
-        updateChain(block, chain);
-      }
-      else {
-        updateState(block, chain);
-      }
-      break;
-    }
-  }
-}

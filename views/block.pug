@@ -7,57 +7,82 @@ block content
       form.form-horizontal
 
         .form-group
-          label.col-sm-2.control-label(for='block1chain1number') #{__('Block')}:
+          label.col-sm-2.control-label(for='block1chain1number') #{__('Block Index')}:
           .col-sm-10
             .input-group
               span.input-group-addon #
-              input#block1chain1number.form-control(type='number', value='1')
+              input#block1chain1number.form-control(type='number', value='1', disabled)
 
         .form-group
-          label.col-sm-2.control-label(for='block1chain1nonce') #{__('Nonce')}:
+          label.col-sm-2.control-label(for='block1chain1matrixA') #{__('Matrix A')}:
           .col-sm-10
-             input#block1chain1nonce.form-control(type='text', value='72608')
+            input#block1chain1matrixA.form-control(type='text', disabled)
 
         .form-group
-          label.col-sm-2.control-label(for='block1chain1data') #{__('Data')}:
+          label.col-sm-2.control-label(for='block1chain1trapdoorA_r') #{__('Trapdoor r of A')}:
+          .col-sm-10
+            input#block1chain1trapdoorA_r.form-control(type='text', disabled)
+
+        .form-group
+          label.col-sm-2.control-label(for='block1chain1trapdoorA_e') #{__('Trapdoor e of A')}:
+          .col-sm-10
+            input#block1chain1trapdoorA_e.form-control(type='text', disabled)
+        
+        .form-group
+          label.col-sm-2.control-label(for='block1chain1nonce_z') #{__('Nonce z')}:
+          .col-sm-10
+            input#block1chain1nonce_z.form-control(type='text', disabled)
+
+        .form-group
+          label.col-sm-2.control-label(for='block1chain1nonce_e1') #{__('Nonce e1')}:
+          .col-sm-10
+            input#block1chain1nonce_e1.form-control(type='text', disabled)
+
+        .form-group
+          label.col-sm-2.control-label(for='block1chain1nonce_e2') #{__('Nonce e2')}:
+          .col-sm-10
+            input#block1chain1nonce_e2.form-control(type='text', disabled)
+
+        .form-group
+          label.col-sm-2.control-label(for='block1chain1data') #{__('Message')}:
           .col-sm-10
             textarea#block1chain1data.form-control(rows='10')
 
         #state.form-group
-          label.col-sm-2.control-label(for='block1chain1hash') #{__('Hash')}:
+          label.col-sm-2.control-label(for='block1chain1hash') #{__('Hash Value')}:
           .col-sm-10
             input#block1chain1hash.form-control(type='text', disabled)
+
+        .form-group
+          label.col-sm-2.control-label(for='block1chain1newdata') #{__('New Message')}:
+          .col-sm-10
+            textarea#block1chain1newdata.form-control(rows='10')
 
         .form-group
           .col-sm-2
             i.icon-spinner.icon-spin.icon-large
           .col-sm-10
-            button#block1chain1mineButton.btn.btn-primary.ladda-button(data-style='expand-right')
-              span.ladda-label #{__('Mine')}
+            button#block1chain1adaptButton.btn.btn-primary.ladda-button(data-style='expand-right')
+              span.ladda-label #{__('Adapt')}
 
   script.
+    $(document).ready(function() {
+        setupBlock(1, 1);
+      });
+    
     $(function() {
-      $('#block1chain1number').bind('input propertychange', function() { updateHash(1, 1); });
-      $('#block1chain1nonce').bind('input propertychange', function() { updateHash(1, 1); });
       $('#block1chain1data').bind('input propertychange', function() { updateHash(1, 1); });
-      mineButtonAnimation(1, 1);
-      updateHash(1, 1);
+      adaptButtonAnimation(1, 1);
     });
 
-    function getText(block, chain) {
-      return $('#block'+block+'chain'+chain+'number').val() +
-             $('#block'+block+'chain'+chain+'nonce').val() +
-             $('#block'+block+'chain'+chain+'data').val();
-    }
-
-    function mineButtonAnimation(block, chain) {
-      $('#block'+block+'chain'+chain+'mineButton').click(function(e) {
-          e.preventDefault();
-          var l = Ladda.create(this);
-          l.start();
-          setTimeout(function() {
-              mine(block, chain, false);
-              l.stop();
+    function adaptButtonAnimation(block, chain) {
+      $('#block'+block+'chain'+chain+'adaptButton').click(function(e) {
+        e.preventDefault();
+        var l = Ladda.create(this);
+        l.start();
+        setTimeout(function() {
+          adaptBlock(block, chain);
+          l.stop();
             }, 250); // give UI time to update
-        });
+      });
     }

@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/megaryan/blockchain-demo/build",
+  "command": "/usr/bin/c++  -DNAPI_VERSION=3 -Daddon_EXPORTS -I/usr/local/include/palisade -I/usr/local/include/palisade/third-party/include -I/usr/local/include/palisade/core -I/usr/local/include/palisade/pke -I/usr/local/include/palisade/cereal -I/usr/local/include/palisade/binfhe -I/usr/local/include/palisade/nlohmann -I/home/megaryan/.cmake-js/node-x64/v20.14.0/include/node -I/home/megaryan/blockchain-demo/node_modules/node-addon-api   -Wall -Werror -O3  -DPALISADE_VERSION=1.11.9 -Wno-parentheses -DMATHBACKEND=2 -fopenmp -fopenmp -g -fPIC   -std=gnu++11 -o CMakeFiles/addon.dir/src/chameleonhash.cpp.o -c /home/megaryan/blockchain-demo/src/chameleonhash.cpp",
+  "file": "/home/megaryan/blockchain-demo/src/chameleonhash.cpp"
+}
+]

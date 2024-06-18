@@ -2,35 +2,72 @@
   form.form-horizontal
 
     .form-group
-      label.col-sm-2.control-label(for='block'+block.block+'chain'+block.chain+'number') #{__('Block')}:
+      label.col-sm-2.control-label(for='block'+block.block+'chain'+block.chain+'number') #{__('Block Index')}:
       .col-sm-10
         .input-group
           span.input-group-addon #
-          input.form-control(id='block'+block.block+'chain'+block.chain+'number', type='number', value=block.block)
+          input.form-control(id='block'+block.block+'chain'+block.chain+'number', type='number', value=block.block, disabled)
 
     .form-group
-      label.col-sm-2.control-label(for='block'+block.block+'chain'+block.chain+'nonce') #{__('Nonce')}:
+      label.col-sm-2.control-label(for='block'+block.block+'chain'+block.chain+'matrixA') #{__('Matrix A')}:
       .col-sm-10
-         input.form-control(id='block'+block.block+'chain'+block.chain+'nonce', type='text', value=block.nonce)
+         input.form-control(id='block'+block.block+'chain'+block.chain+'matrixA', type='text', value=block.matrixA, disabled)
 
     .form-group
-      label.col-sm-2.control-label(for='block'+block.block+'chain'+block.chain+'data') #{__('Data')}:
+      label.col-sm-2.control-label(for='block'+block.block+'chain'+block.chain+'trapdoorA_r') #{__('Trapdoor r of A')}:
+      .col-sm-10
+         input.form-control(id='block'+block.block+'chain'+block.chain+'trapdoorA_r', type='text', value=block.trapdoorA_r, disabled)
+
+    .form-group
+      label.col-sm-2.control-label(for='block'+block.block+'chain'+block.chain+'trapdoorA_e') #{__('Trapdoor e of A')}:
+      .col-sm-10
+         input.form-control(id='block'+block.block+'chain'+block.chain+'trapdoorA_e', type='text', value=block.trapdoorA_e, disabled)
+
+    .form-group
+      label.col-sm-2.control-label(for='block'+block.block+'chain'+block.chain+'nonce_z') #{__('Nonce z')}:
+      .col-sm-10
+         input.form-control(id='block'+block.block+'chain'+block.chain+'nonce_z', type='text', value=block.nonce_z, disabled)
+
+    .form-group
+      label.col-sm-2.control-label(for='block'+block.block+'chain'+block.chain+'nonce_e1') #{__('Nonce e1')}:
+      .col-sm-10
+         input.form-control(id='block'+block.block+'chain'+block.chain+'nonce_e1', type='text', value=block.nonce_e1, disabled)
+  
+    .form-group
+      label.col-sm-2.control-label(for='block'+block.block+'chain'+block.chain+'nonce_e2') #{__('Nonce e2')}:
+      .col-sm-10
+         input.form-control(id='block'+block.block+'chain'+block.chain+'nonce_e2', type='text', value=block.nonce_e2, disabled)
+
+    .form-group
+      label.col-sm-2.control-label(for='block'+block.block+'chain'+block.chain+'data') #{__('Message')}:
       .col-sm-10
         textarea.form-control(id='block'+block.block+'chain'+block.chain+'data', rows='10')
 
     #state.form-group
-      label.col-sm-2.control-label(for='block'+block.block+'chain'+block.chain+'previous') #{__('Prev')}:
+      label.col-sm-2.control-label(for='block'+block.block+'chain'+block.chain+'previous') #{__('Prev Hash')}:
       .col-sm-10
         input.form-control(id='block'+block.block+'chain'+block.chain+'previous', type='text', value=block.previous, disabled)
+    
+    .form-group
+      .col-sm-2
+        i.icon-spinner.icon-spin.icon-large
+      .col-sm-10
+        button.btn.btn-primary.ladda-button(id='block'+block.block+'chain'+block.chain+'updatePrevButton', data-style='expand-right')
+          span.ladda-label #{__('Update Prev')}
 
     #state.form-group
-      label.col-sm-2.control-label(for='block'+block.block+'chain'+block.chain+'hash') #{__('Hash')}:
+      label.col-sm-2.control-label(for='block'+block.block+'chain'+block.chain+'hash') #{__('Hash Value')}:
       .col-sm-10
         input.form-control(id='block'+block.block+'chain'+block.chain+'hash', type='text', disabled)
+
+    .form-group
+      label.col-sm-2.control-label(for='block'+block.block+'chain'+block.chain+'newdata') #{__('New Message')}:
+      .col-sm-10
+        textarea.form-control(id='block'+block.block+'chain'+block.chain+'newdata', rows='10')
 
     .form-group
       .col-sm-2
         i.icon-spinner.icon-spin.icon-large
       .col-sm-10
-        button.btn.btn-primary.ladda-button(id='block'+block.block+'chain'+block.chain+'mineButton', data-style='expand-right')
-          span.ladda-label #{__('Mine')}
+        button.btn.btn-primary.ladda-button(id='block'+block.block+'chain'+block.chain+'adaptButton', data-style='expand-right')
+          span.ladda-label #{__('Adapt')}

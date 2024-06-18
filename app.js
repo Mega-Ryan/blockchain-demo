@@ -10,6 +10,8 @@ var routes = require('./routes/index');
 
 var app = express();
 
+const addon = require('./build/Release/addon.node');
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -22,10 +24,35 @@ app.use(cookieParser());
 app.use(i18n.init);
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+app.get('/api/setup/:initialMessage', (req, res) => {
+  const message = req.params.initialMessage; // Capture the route parameter
+  // console.log('setupInput:', message);
+  const result = addon.Setup(message); // Assuming someFunction takes a message and does something
+  // console.log('setupOutput:', result);
+  res.send({ result });
+});
+
+app.post('/api/hash/', (req, res) => {
+  const hashInput = req.body.hashinfo; // Capture the route parameter
+  console.log('hashInput:', hashInput);
+  const result = addon.Hash(hashInput.A, hashInput.z, hashInput.e1, hashInput.e2, hashInput.message); // Assuming someFunction takes a message and does something
+  res.send({ result });
+  // console.log('hashOutput z:', result.z);
+});
+
+app.post('/api/adapt/', (req, res) => {
+  const adaptInput = req.body.adaptinfo; // Capture the route parameter
+  console.log('adaptInput h:', adaptInput.h);
+  const result = addon.Adapt(adaptInput.A, adaptInput.trapdoor_r, adaptInput.trapdoor_e, adaptInput.z, adaptInput.e1, adaptInput.e2, adaptInput.message, adaptInput.h, adaptInput.new_message); // Assuming someFunction takes a message and does something
+  console.log('adaptOutput new_h:', result.new_h);
+  res.send({ result });
+});
+
 app.use('/', routes);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
@@ -36,7 +63,7 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
+  app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
@@ -47,7 +74,7 @@ if (app.get('env') === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,
@@ -56,7 +83,7 @@ app.use(function(err, req, res, next) {
 });
 
 i18n.configure({
-  locales:['en', 'de', 'es', 'fr-CA', 'hi', 'ja', 'ko', 'nl', 'pl', 'pt', 'zh-CN', 'hu', 'id'],
+  locales: ['en', 'zh-CN'],
   directory: __dirname + '/locales'
 });
 

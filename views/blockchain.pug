@@ -5,43 +5,65 @@ block content
     h1 #{__('Blockchain')}
     .row.row-horizon
       - var blocks = []
-      - blocks.push({block: 1, chain: 1, nonce: 11316, previous: '0000000000000000000000000000000000000000000000000000000000000000'})
-      - blocks.push({block: 2, chain: 1, nonce: 35230, previous: '000015783b764259d382017d91a36d206d0600e2cbb3567748f46a33fe9297cf'})
-      - blocks.push({block: 3, chain: 1, nonce: 12937, previous: '000012fa9b916eb9078f8d98a7864e697ae83ed54f5146bd84452cdafd043c19'})
-      - blocks.push({block: 4, chain: 1, nonce: 35990, previous: '0000b9015ce2a08b61216ba5a0778545bf4ddd7ceb7bbd85dd8062b29a9140bf'})
-      - blocks.push({block: 5, chain: 1, nonce: 56265, previous: '0000ae8bbc96cf89c68be6e10a865cc47c6c48a9ebec3c6cad729646cefaef83'})
+      - blocks.push({block: 1, chain: 1, previous: '0000000000000000000000000000000000000000000000000000000000000000'})
+      - blocks.push({block: 2, chain: 1, previous: '0000000000000000000000000000000000000000000000000000000000000000'})
+      - blocks.push({block: 3, chain: 1, previous: '0000000000000000000000000000000000000000000000000000000000000000'})
+      - blocks.push({block: 4, chain: 1, previous: '0000000000000000000000000000000000000000000000000000000000000000'})
+      - blocks.push({block: 5, chain: 1, previous: '0000000000000000000000000000000000000000000000000000000000000000'})
       each block in blocks
         .col-xs-7
           include includes/block
 
   script.
-    $(function() {
-      setup(1, 1);
-      setup(2, 1);
-      setup(3, 1);
-      setup(4, 1);
-      setup(5, 1);
+    $(document).ready(function() {
+      setupBlock(1, 1);
+      setupBlock(2, 1);
+      setupBlock(3, 1);
+      setupBlock(4, 1);
+      setupBlock(5, 1);
     });
 
-    function getText(block, chain) {
-      return $('#block'+block+'chain'+chain+'number').val() +
-             $('#block'+block+'chain'+chain+'nonce').val() +
-             $('#block'+block+'chain'+chain+'data').val() +
-             $('#block'+block+'chain'+chain+'previous').val();
+    $(function() {
+      $('#block1chain1data').bind('input propertychange', function() { updateHash(1, 1); updateState(2, 1); });
+      $('#block2chain1data').bind('input propertychange', function() { updateHash(2, 1); updateState(3, 1); });
+      $('#block3chain1data').bind('input propertychange', function() { updateHash(3, 1); updateState(4, 1); });
+      $('#block4chain1data').bind('input propertychange', function() { updateHash(4, 1); updateState(5, 1); });
+      $('#block5chain1data').bind('input propertychange', function() { updateHash(5, 1)});
+
+      adaptButtonAnimation(1, 1);
+      adaptButtonAnimation(2, 1);
+      adaptButtonAnimation(3, 1);
+      adaptButtonAnimation(4, 1);
+      adaptButtonAnimation(5, 1);
+
+      updatePrevButtonAnimation(1, 1);
+      updatePrevButtonAnimation(2, 1);
+      updatePrevButtonAnimation(3, 1);
+      updatePrevButtonAnimation(4, 1);
+      updatePrevButtonAnimation(5, 1);
+    });
+
+    function adaptButtonAnimation(block, chain) {
+      $('#block'+block+'chain'+chain+'adaptButton').click(function(e) {
+        e.preventDefault();
+        var l = Ladda.create(this);
+        l.start();
+        setTimeout(function() {
+          adaptBlock(block, chain);
+          l.stop();
+            }, 250); // give UI time to update
+      });
     }
 
-    function setup(block, chain) {
-      updateHash(block, chain);
-      $('#block'+block+'chain'+chain+'number').bind('input propertychange', function() { updateChain(block, chain); });
-      $('#block'+block+'chain'+chain+'nonce').bind('input propertychange', function() { updateChain(block, chain); });
-      $('#block'+block+'chain'+chain+'data').bind('input propertychange', function() { updateChain(block, chain); });
-      $('#block'+block+'chain'+chain+'mineButton').click(function(e) {
-          e.preventDefault();
-          var l = Ladda.create(this);
-          l.start();
-          setTimeout(function() {
-              mine(block, chain, true);
-              l.stop();
+    function updatePrevButtonAnimation(block, chain) {
+      $('#block'+block+'chain'+chain+'updatePrevButton').click(function(e) {
+        e.preventDefault();
+        var l = Ladda.create(this);
+        l.start();
+        setTimeout(function() {
+          updatePrevHash(block, chain);
+          l.stop();
             }, 250); // give UI time to update
-        });
+      });
     }
+

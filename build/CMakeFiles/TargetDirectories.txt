@@ -1,0 +1,3 @@
+/home/megaryan/blockchain-demo/build/CMakeFiles/rebuild_cache.dir
+/home/megaryan/blockchain-demo/build/CMakeFiles/edit_cache.dir
+/home/megaryan/blockchain-demo/build/CMakeFiles/addon.dir

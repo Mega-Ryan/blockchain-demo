@@ -22,8 +22,9 @@ html
     script(src='/javascripts/lib/spin.min.js')
     script(src='/javascripts/lib/ladda.min.js')
     script(src='/javascripts/lib/ie10-viewport-bug-workaround.js')
-    script(src='/javascripts/lib/sha256.js')
+    script(src="/javascripts/lib/axios.min.js")
     script(src='/javascripts/blockchain.js')
+
 
   body
     nav.navbar.navbar-inverse.navbar-fixed-top
@@ -37,17 +38,9 @@ html
           a.navbar-brand(href='/') #{__('Blockchain Demo')}
         #navbar.collapse.navbar-collapse
           ul.nav.navbar-nav.navbar-right
-            li(class={active: page === 'hash'})
-              a(href='/hash') #{__('Hash')}
             li(class={active: page === 'block'})
               a(href='/block') #{__('Block')}
             li(class={active: page === 'blockchain'})
               a(href='/blockchain') #{__('Blockchain')}
-            li(class={active: page === 'distributed'})
-              a(href='/distributed') #{__('Distributed')}
-            li(class={active: page === 'tokens'})
-              a(href='/tokens') #{__('Tokens')}
-            li(class={active: page === 'coinbase'})
-              a(href='/coinbase') #{__('Coinbase')}
 
     block content
