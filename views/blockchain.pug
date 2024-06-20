@@ -5,11 +5,11 @@ block content
     h1 #{__('Blockchain')}
     .row.row-horizon
       - var blocks = []
-      - blocks.push({block: 1, chain: 1, previous: '0000000000000000000000000000000000000000000000000000000000000000'})
-      - blocks.push({block: 2, chain: 1, previous: '0000000000000000000000000000000000000000000000000000000000000000'})
-      - blocks.push({block: 3, chain: 1, previous: '0000000000000000000000000000000000000000000000000000000000000000'})
-      - blocks.push({block: 4, chain: 1, previous: '0000000000000000000000000000000000000000000000000000000000000000'})
-      - blocks.push({block: 5, chain: 1, previous: '0000000000000000000000000000000000000000000000000000000000000000'})
+      - blocks.push({block: 1, chain: 1, previous: ''})
+      - blocks.push({block: 2, chain: 1, previous: ''})
+      - blocks.push({block: 3, chain: 1, previous: ''})
+      - blocks.push({block: 4, chain: 1, previous: ''})
+      - blocks.push({block: 5, chain: 1, previous: ''})
       each block in blocks
         .col-xs-7
           include includes/block
