@@ -28,46 +28,55 @@ const uint32_t k_256[64] = {
     0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
     0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2};
 
-void modifyJsonValue(std::string filename) {
+void modifyJsonValue(std::string filename)
+{
   // Load the JSON file
   std::ifstream input_file(filename);
   nlohmann::ordered_json j;
   input_file >> j;
 
   // Check and modify the value of key "f"
-  try {
+  try
+  {
     nlohmann::ordered_json &f = j["value0"]["d"][0][0]["f"];
     // Check if the key exists and if the value is 1, then modify it
-    if (f.is_number() && f.get<int>() == 1) {
-      f = 0;  // Change the value to 0
+    if (f.is_number() && f.get<int>() == 1)
+    {
+      f = 0; // Change the value to 0
       std::cout << "Value of 'f' changed to 0." << std::endl;
     }
-  } catch (const nlohmann::ordered_json::exception &e) {
+  }
+  catch (const nlohmann::ordered_json::exception &e)
+  {
     std::cerr << "Error accessing key 'f': " << e.what() << std::endl;
   }
 
   // Save the modified JSON back to the file
   std::ofstream output_file(filename);
-  output_file << j.dump(4);  // dump with an indent of 4 spaces
+  output_file << j.dump(4); // dump with an indent of 4 spaces
 }
 
-class ChameleonHash {
- private:
+class ChameleonHash
+{
+private:
 #define RIGHT_ROT(x, n)          \
   ((x >> (n % (sizeof(x) * 8)) | \
     (x << ((sizeof(x) * 8) - (n % (sizeof(x) * 8))))))
 
-  static void SHA256(string &message, vector<int64_t> &digest) {
+  static void SHA256(string &message, vector<int64_t> &digest)
+  {
     uint32_t h_256[8] = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
                          0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
 
     uint64_t m_len = message.size() * 8;
     uint16_t pad_len = 1;
-    while ((m_len + pad_len) % 512 != 448) {
+    while ((m_len + pad_len) % 512 != 448)
+    {
       pad_len++;
     }
     message.push_back(0);
-    for (int a = 0; a < (pad_len) / 8 - 1; a++) {
+    for (int a = 0; a < (pad_len) / 8 - 1; a++)
+    {
       message.push_back(0);
     }
     message.push_back((uint8_t)((m_len & 0xff00000000000000) >> 56));
@@ -79,17 +88,20 @@ class ChameleonHash {
     message.push_back((uint8_t)((m_len & 0x000000000000ff00) >> 8));
     message.push_back((uint8_t)(m_len & 0x00000000000000ff));
 
-    for (size_t n = 0; n < (message.size() * 8) / 512; n++) {
+    for (size_t n = 0; n < (message.size() * 8) / 512; n++)
+    {
       uint32_t w[64];
       short counter = 0;
-      for (size_t m = 64 * n; m < (64 * (n + 1)); m += 4) {
+      for (size_t m = 64 * n; m < (64 * (n + 1)); m += 4)
+      {
         w[counter] = ((uint32_t)message.at(m) << 24) ^
                      ((uint32_t)message.at(m + 1) << 16) ^
                      ((uint32_t)message.at(m + 2) << 8) ^
                      ((uint32_t)message.at(m + 3));
         counter++;
       }
-      for (int i = 16; i < 64; i++) {
+      for (int i = 16; i < 64; i++)
+      {
         uint32_t s0 = ((uint32_t)RIGHT_ROT(w[i - 15], 7)) ^
                       ((uint32_t)(RIGHT_ROT(w[i - 15], 18))) ^
                       ((uint32_t)(w[i - 15] >> 3));
@@ -108,7 +120,8 @@ class ChameleonHash {
       uint32_t g = h_256[6];
       uint32_t h = h_256[7];
 
-      for (int i = 0; i < 64; i++) {
+      for (int i = 0; i < 64; i++)
+      {
         uint32_t S1 = ((uint32_t)RIGHT_ROT(e, 6)) ^
                       ((uint32_t)RIGHT_ROT(e, 11)) ^
                       ((uint32_t)RIGHT_ROT(e, 25));
@@ -140,21 +153,25 @@ class ChameleonHash {
       h_256[7] += h;
     }
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++)
+    {
       digest.push_back(h_256[i]);
     }
 
     return;
   }
 
-  static void t_SHA256(string message, vector<int64_t> &digest, size_t t) {
+  static void t_SHA256(string message, vector<int64_t> &digest, size_t t)
+  {
     size_t times = t;
-    for (size_t i = 0; i < times; i++) {
+    for (size_t i = 0; i < times; i++)
+    {
       SHA256(message, digest);
     }
   }
 
-  static Matrix<Poly> customHash(Matrix<Poly> &A, string message, BigVector z) {
+  static Matrix<Poly> customHash(Matrix<Poly> &A, string message, BigVector z)
+  {
     usint m = 16;
     usint n = 8;
     BigInteger modulus("67108913");
@@ -162,28 +179,35 @@ class ChameleonHash {
     auto params = make_shared<ILParams>(m, modulus, rootOfUnity);
 
     string A_str = "";
-    for (size_t i = 0; i < A.GetRows(); i++) {
-      for (size_t j = 0; j < A.GetCols(); j++) {
-        for (size_t k = 0; k < n; k++) {
+    for (size_t i = 0; i < A.GetRows(); i++)
+    {
+      for (size_t j = 0; j < A.GetCols(); j++)
+      {
+        for (size_t k = 0; k < n; k++)
+        {
           A_str += A(i, j)[k].ToString();
         }
       }
     }
 
     string z_str = "";
-    for (size_t i = 0; i < z.GetLength(); i++) {
+    for (size_t i = 0; i < z.GetLength(); i++)
+    {
       z_str += z[i].ToString();
     }
 
     string hash_input = A_str + message + z_str;
     vector<int64_t> digestVector;
-    size_t t = 10;  // the output dimension of customHash function
+    size_t t = 10; // the output dimension of customHash function
     t_SHA256(hash_input, digestVector, t);
     // cout << digestVector.size() << endl;
 
-    Matrix<int64_t> digestMatrix([]() { return 0; }, t, n);
-    for (size_t i = 0; i < t; i++) {
-      for (size_t j = 0; j < n; j++) {
+    Matrix<int64_t> digestMatrix([]()
+                                 { return 0; }, t, n);
+    for (size_t i = 0; i < t; i++)
+    {
+      for (size_t j = 0; j < n; j++)
+      {
         digestMatrix(i, j) = digestVector[i * n + j];
       }
     }
@@ -208,8 +232,9 @@ class ChameleonHash {
     return result;
   }
 
- public:
-  static pair<Matrix<Poly>, RLWETrapdoorPair<Poly>> TrapGen() {
+public:
+  static pair<Matrix<Poly>, RLWETrapdoorPair<Poly>> TrapGen()
+  {
     usint m = 16;
     BigInteger modulus("67108913");
     BigInteger rootOfUnity("61564");
@@ -218,7 +243,7 @@ class ChameleonHash {
     auto params = make_shared<ILParams>(m, modulus, rootOfUnity);
     pair<Matrix<Poly>, RLWETrapdoorPair<Poly>> trapdoorA =
         RLWETrapdoorUtility<Poly>::TrapdoorGen(
-            params, stddev);  // A.first is the public element
+            params, stddev); // A.first is the public element
 
     // cout << trapdoorA.first.GetRows() << endl;
     // cout << trapdoorA.first.GetCols() << endl;
@@ -235,7 +260,8 @@ class ChameleonHash {
   }
 
   static Matrix<Poly> Hash(Matrix<Poly> &A, string message, BigVector &z_out,
-                           Matrix<Poly> &e1_out, Matrix<Poly> &e2_out) {
+                           Matrix<Poly> &e1_out, Matrix<Poly> &e2_out)
+  {
     usint m = 16;
     usint n = 8;
     BigInteger modulus("67108913");
@@ -261,19 +287,25 @@ class ChameleonHash {
     // SMOOTHING_PARAMETER = 6;
     DiscreteGaussianGenerator dggRejection(stddev);
 
-    Matrix<int64_t> e1Matrix([]() { return 0; }, A.GetCols(), n);
-    Matrix<int64_t> e2Matrix([]() { return 0; }, Ah.GetCols(), n);
+    Matrix<int64_t> e1Matrix([]()
+                             { return 0; }, A.GetCols(), n);
+    Matrix<int64_t> e2Matrix([]()
+                             { return 0; }, Ah.GetCols(), n);
 
-    for (size_t i = 0; i < A.GetCols(); i++) {
+    for (size_t i = 0; i < A.GetCols(); i++)
+    {
       BigVector e1Vector = dggRejection.GenerateVector(n, modulus);
-      for (size_t j = 0; j < n; j++) {
+      for (size_t j = 0; j < n; j++)
+      {
         e1Matrix(i, j) = e1Vector[j].ConvertToInt();
       }
     }
 
-    for (size_t i = 0; i < Ah.GetCols(); i++) {
+    for (size_t i = 0; i < Ah.GetCols(); i++)
+    {
       BigVector e2Vector = dggRejection.GenerateVector(n, modulus);
-      for (size_t j = 0; j < n; j++) {
+      for (size_t j = 0; j < n; j++)
+      {
         e2Matrix(i, j) = e2Vector[j].ConvertToInt();
       }
     }
@@ -308,7 +340,8 @@ class ChameleonHash {
   }
 
   static Matrix<Poly> fixedHash(Matrix<Poly> &A, string message, BigVector &z,
-                                Matrix<Poly> &e1, Matrix<Poly> &e2) {
+                                Matrix<Poly> &e1, Matrix<Poly> &e2)
+  {
     usint m = 16;
     // usint n = 8;
     BigInteger modulus("67108913");
@@ -340,7 +373,8 @@ class ChameleonHash {
   }
 
   static bool Verify(Matrix<Poly> &A, Matrix<Poly> &h, string message,
-                     BigVector &z, Matrix<Poly> &e1, Matrix<Poly> &e2) {
+                     BigVector &z, Matrix<Poly> &e1, Matrix<Poly> &e2)
+  {
     usint m = 16;
     // usint n = 8;
     BigInteger modulus("67108913");
@@ -376,22 +410,24 @@ class ChameleonHash {
                     Matrix<Poly> &h, string message, BigVector &z,
                     Matrix<Poly> &e1, Matrix<Poly> &e2, string new_message,
                     BigVector &z_out, Matrix<Poly> &e1_out,
-                    Matrix<Poly> &e2_out) {
-    if (!Verify(A, h, message, z, e1, e2)) {
+                    Matrix<Poly> &e2_out)
+  {
+    if (!Verify(A, h, message, z, e1, e2))
+    {
       cout << "Invalid input" << endl;
       return;
     }
 
-    usint m = 16;                    // m次分圆多项式
-    usint n = 8;                     // 多项式的次数
-    BigInteger modulus("67108913");  // 多项式系数的模数
+    usint m = 16;                   // m次分圆多项式
+    usint n = 8;                    // 多项式的次数
+    BigInteger modulus("67108913"); // 多项式系数的模数
     BigInteger rootOfUnity(
-        "61564");           // m次单位根    rootOfUnity ^ m = 1 mod modulus
-    double stddev = SIGMA;  // 标准差
-    double val = modulus.ConvertToDouble();  // TODO get the next few lines
-                                             // working in a single instance.
+        "61564");                           // m次单位根    rootOfUnity ^ m = 1 mod modulus
+    double stddev = SIGMA;                  // 标准差
+    double val = modulus.ConvertToDouble(); // TODO get the next few lines
+                                            // working in a single instance.
     double logTwo = log(val - 1.0) / log(2) + 1.0;
-    usint k = (usint)floor(logTwo);  // = this->m_cryptoParameters.GetModulus();
+    usint k = (usint)floor(logTwo); // = this->m_cryptoParameters.GetModulus();
 
     auto params = make_shared<ILParams>(m, modulus, rootOfUnity);
 
@@ -402,11 +438,14 @@ class ChameleonHash {
     Matrix<Poly> new_Ah = customHash(A, new_message, new_z);
 
     DiscreteGaussianGenerator dggRejection(stddev);
-    Matrix<int64_t> new_e2Matrix([]() { return 0; }, new_Ah.GetCols(), n);
+    Matrix<int64_t> new_e2Matrix([]()
+                                 { return 0; }, new_Ah.GetCols(), n);
 
-    for (size_t i = 0; i < new_Ah.GetCols(); i++) {
+    for (size_t i = 0; i < new_Ah.GetCols(); i++)
+    {
       BigVector new_e2Vector = dggRejection.GenerateVector(n, modulus);
-      for (size_t j = 0; j < n; j++) {
+      for (size_t j = 0; j < n; j++)
+      {
         new_e2Matrix(i, j) = new_e2Vector[j].ConvertToInt();
       }
     }
@@ -472,21 +511,27 @@ class ChameleonHash {
   }
 };
 
-Napi::Array BigVectorToNapiArray(Napi::Env env, BigVector vector) {
+Napi::Array BigVectorToNapiArray(Napi::Env env, BigVector vector)
+{
   Napi::Array array = Napi::Array::New(env);
-  for (size_t i = 0; i < vector.GetLength(); i++) {
+  for (size_t i = 0; i < vector.GetLength(); i++)
+  {
     array.Set(i, Napi::Number::New(env, vector[i].ConvertToInt()));
   }
   return array;
 }
 
-Napi::Array MatrixToNapiArray(Napi::Env env, Matrix<Poly> matrix) {
+Napi::Array MatrixToNapiArray(Napi::Env env, Matrix<Poly> matrix)
+{
   Napi::Array array = Napi::Array::New(env);
-  for (size_t i = 0; i < matrix.GetRows(); i++) {
+  for (size_t i = 0; i < matrix.GetRows(); i++)
+  {
     Napi::Array row = Napi::Array::New(env);
-    for (size_t j = 0; j < matrix.GetCols(); j++) {
+    for (size_t j = 0; j < matrix.GetCols(); j++)
+    {
       Napi::Array element = Napi::Array::New(env);
-      for (size_t k = 0; k < matrix(i, j).GetLength(); k++) {
+      for (size_t k = 0; k < matrix(i, j).GetLength(); k++)
+      {
         element.Set(k, Napi::Number::New(env, matrix(i, j)[k].ConvertToInt()));
       }
       row.Set(j, element);
@@ -497,25 +542,29 @@ Napi::Array MatrixToNapiArray(Napi::Env env, Matrix<Poly> matrix) {
 }
 
 Napi::Object RLWETrapdoorPairToNapiObject(Napi::Env env,
-                                          RLWETrapdoorPair<Poly> trapdoor) {
+                                          RLWETrapdoorPair<Poly> trapdoor)
+{
   Napi::Object obj = Napi::Object::New(env);
   obj.Set("r", MatrixToNapiArray(env, trapdoor.m_r));
   obj.Set("e", MatrixToNapiArray(env, trapdoor.m_e));
   return obj;
 }
 
-BigVector NapiArrayToBigVector(Napi::Env env, Napi::Array array) {
+BigVector NapiArrayToBigVector(Napi::Env env, Napi::Array array)
+{
   BigInteger modulus("67108913");
   size_t length = array.Length();
   BigVector vector(length, modulus);
-  for (size_t i = 0; i < length; i++) {
+  for (size_t i = 0; i < length; i++)
+  {
     vector[i] = BigInteger(array.Get(i).As<Napi::Number>().Int64Value());
   }
   return vector;
 }
 
 Matrix<Poly> SingleColNapiArrayToMatrix(Napi::Env env, Napi::Array array,
-                                        size_t col = 0) {
+                                        size_t col = 0)
+{
   size_t rows = array.Length();
   size_t degree = array.Get(uint32_t(0))
                       .As<Napi::Array>()
@@ -526,11 +575,14 @@ Matrix<Poly> SingleColNapiArrayToMatrix(Napi::Env env, Napi::Array array,
   // cout << "rows: " << rows << endl;
   // cout << "degree: " << degree << endl;
 
-  Matrix<int64_t> matrix([]() { return 0; }, rows, degree);
-  for (size_t i = 0; i < rows; i++) {
+  Matrix<int64_t> matrix([]()
+                         { return 0; }, rows, degree);
+  for (size_t i = 0; i < rows; i++)
+  {
     Napi::Array row = array.Get(i).As<Napi::Array>();
     Napi::Array element = row.Get(col).As<Napi::Array>();
-    for (size_t k = 0; k < degree; k++) {
+    for (size_t k = 0; k < degree; k++)
+    {
       matrix(i, k) = element.Get(k).As<Napi::Number>().Int64Value();
     }
   }
@@ -545,7 +597,8 @@ Matrix<Poly> SingleColNapiArrayToMatrix(Napi::Env env, Napi::Array array,
   return matrixPoly;
 }
 
-Matrix<Poly> MultColNapiArrayToMatrix(Napi::Env env, Napi::Array array) {
+Matrix<Poly> MultColNapiArrayToMatrix(Napi::Env env, Napi::Array array)
+{
   size_t rows = array.Length();
   size_t cols = array.Get(uint32_t(0)).As<Napi::Array>().Length();
 
@@ -553,15 +606,18 @@ Matrix<Poly> MultColNapiArrayToMatrix(Napi::Env env, Napi::Array array) {
   // cout << "cols: " << cols << endl;
 
   Matrix<Poly> matrixPoly = SingleColNapiArrayToMatrix(env, array, 0);
-  for (size_t i = 0; i < rows; i++) {
-    for (size_t j = 1; j < cols; j++) {
+  for (size_t i = 0; i < rows; i++)
+  {
+    for (size_t j = 1; j < cols; j++)
+    {
       matrixPoly.HStack(SingleColNapiArrayToMatrix(env, array, j));
     }
   }
   return matrixPoly;
 }
 
-Napi::Object SetupWrapped(const Napi::CallbackInfo &info) {
+Napi::Object SetupWrapped(const Napi::CallbackInfo &info)
+{
   Napi::Env env = info.Env();
   pair<Matrix<Poly>, RLWETrapdoorPair<Poly>> trapdoorA =
       ChameleonHash::TrapGen();
@@ -583,8 +639,10 @@ Napi::Object SetupWrapped(const Napi::CallbackInfo &info) {
   return obj;
 }
 
-Napi::Object fixedHashWrapped(const Napi::CallbackInfo &info) {
-  if (info.Length() != 5) {
+Napi::Object fixedHashWrapped(const Napi::CallbackInfo &info)
+{
+  if (info.Length() != 5)
+  {
     cout << "wrong info length" << endl;
   }
 
@@ -606,8 +664,10 @@ Napi::Object fixedHashWrapped(const Napi::CallbackInfo &info) {
   return obj;
 }
 
-Napi::Object AdaptWrapped(const Napi::CallbackInfo &info) {
-  if (info.Length() != 9) {
+Napi::Object AdaptWrapped(const Napi::CallbackInfo &info)
+{
+  if (info.Length() != 9)
+  {
     cout << "wrong info length" << endl;
   }
 
@@ -644,7 +704,8 @@ Napi::Object AdaptWrapped(const Napi::CallbackInfo &info) {
   return obj;
 }
 
-Napi::Object Init(Napi::Env env, Napi::Object exports) {
+Napi::Object Init(Napi::Env env, Napi::Object exports)
+{
   exports.Set("Setup", Napi::Function::New(env, SetupWrapped));
   exports.Set("Hash", Napi::Function::New(env, fixedHashWrapped));
   exports.Set("Adapt", Napi::Function::New(env, AdaptWrapped));
