@@ -1,6 +1,6 @@
 FROM       node:alpine 
 
-MAINTAINER https://github.com/anders94/blockchain-demo
+LABEL      maintainer=https://github.com/Mega-Ryan/blockchain-demo
 
 EXPOSE     3000
 

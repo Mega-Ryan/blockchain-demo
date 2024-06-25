@@ -1,6 +1,6 @@
 *~
 .*~
 node_modules/
+build/
 tools/runkeeper/
 docker-compose.override.yml
-calculated_h.json

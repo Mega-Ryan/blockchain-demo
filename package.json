@@ -2,7 +2,7 @@
   "name": "blockchain-demo",
   "description": "A web-based demonstration of blockchain concepts.",
   "author": {
-    "name": "Anders Brownworth"
+    "name": "MegaRyan"
   },
   "version": "0.0.1",
   "keywords": [
@@ -16,10 +16,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anders94/blockchain-demo.git"
+    "url": "git+https://github.com/Mega-Ryan/blockchain-demo.git"
   },
   "bugs": {
-    "url": "https://github.com/anders94/blockchain-demo/issues"
+    "url": "https://github.com/Mega-Ryan/blockchain-demo/issues"
   },
   "license": "MIT",
   "gypfile": true,
@@ -35,11 +35,11 @@
     "pug": "^3.0.1",
     "serve-favicon": "^2.5.0"
   },
-  "homepage": "https://github.com/anders94/blockchain-demo#readme",
+  "homepage": "https://github.com/Mega-Ryan/blockchain-demo#readme",
   "maintainers": [
     {
-      "name": "anders",
-      "email": "anders-git@evantide.com"
+      "name": "MegaRyan",
+      "email": "ryan_zenn@outlook.com"
     }
   ],
   "devDependencies": {
